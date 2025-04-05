@@ -1,6 +1,10 @@
 from input_handler import get_key
+from colorama import Fore, Style, init
+import sys
 import time
 import os
+
+init(autoreset=True)
 
 # First 100 digits of pi (after 3)
 PI_DIGITS = (
@@ -10,36 +14,51 @@ PI_DIGITS = (
 )
 
 def play_game():
-    print("Welcome to pinfinite, the pi memory game! Let's test how many numbers your remember.")
+    print(Style.BRIGHT + Fore.CYAN + "Welcome to Pinfinite! Let's test how many numbers of π your remember.")
     print("Press 'q' at any time to quit.")
 
-    index = 0;
+    streak = "3."
+    index = 0
     start_time = time.time()
+
+    print(streak, end="", flush=True)
 
     while True: 
         expected_digit = PI_DIGITS[index]
-        print(f"Digit #{index + 1}: ", end="", flush=True)
         user_input = get_key()
 
-        print(user_input)
+        if index >= len(PI_DIGITS):
+            print(Fore.MAGENTA + "Congratulations! You've completed the game!")
+            break
 
         # quit game
         if user_input.lower() == 'q':
-            print("Thanks for playing!")
+            print(Fore.YELLOW + "Game aborted. Thanks for playing!")
             break
 
         if user_input == expected_digit: 
+            streak += user_input
+            # print(f"\r{streak}", end="", flush=True)
             index += 1
+
+            sys.stdout.write("\r" + " " * 80)
+            sys.stdout.flush()
+            sys.stdout.write("\r" + Fore.GREEN + streak)
+            sys.stdout.flush()
             
         else:
-            print(f"Wrong! The correct digit was '{expected_digit}'.")
-            print(f"Final score: {index}")
+            print(Fore.RED + f"{expected_digit}")
+            print(Fore.YELLOW + f"Score: {index}")
             elapsed_time = time.time() - start_time
-            print(f"Time taken: {elapsed_time:.2f} seconds")
+            print(Fore.YELLOW + f"Time taken: {elapsed_time:.2f}s")
+            print(Fore.CYAN + "Restarting in 3 seconds...")
+            time.sleep(3)
 
             # reset fields
+            streak = "3."
             index = 0
             start_time = time.time()
+            print(streak, end="", flush=True)
 
 if __name__ == "__main__":
     play_game()
